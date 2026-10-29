@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blood Donor Finder</title>
+  <style>
+/* Blood Donor Finder - red and white theme */
+:root {
+  --red: #c62828;
+  --red-dark: #a31f1f;
+  --pink: #fff5f5;
+  --text: #222;
+  --green: #2e7d32;
+  --orange: #e65100;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--pink);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- Top bar ---------- */
+.topbar {
+  background: var(--red);
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 14px 20px;
+}
+.brand { font-size: 1.15rem; font-weight: bold; }
+.menu { display: flex; flex-wrap: wrap; gap: 6px; }
+.nav-btn {
+  background: transparent;
+  color: #fff;
+  border: 1px solid #fff;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.nav-btn.active { background: #fff; color: var(--red); font-weight: bold; }
+
+/* ---------- Layout ---------- */
+.container { flex: 1; width: 100%; max-width: 900px; margin: 0 auto; padding: 16px; }
+.page { display: none; }
+.page.active { display: block; }
+.hidden { display: none !important; }
+.center { text-align: center; }
+h2 { color: var(--red); margin: 6px 0 4px; }
+.hint { font-size: 0.8rem; color: #666; margin: 0 0 10px; }
+
+/* ---------- Home ---------- */
+.banner {
+  background: var(--red);
+  color: #fff;
+  text-align: center;
+  border-radius: 14px;
+  padding: 28px 16px;
+}
+.banner h1 { margin: 0 0 8px; font-size: 1.7rem; }
+.banner p { margin: 0 0 16px; font-size: 0.9rem; }
+.banner-btns { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.light-btn {
+  background: #fff;
+  color: var(--red);
+  border: none;
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
+.stat {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  text-align: center;
+  padding: 14px 8px;
+}
+.stat b { display: block; font-size: 1.6rem; color: var(--red); }
+.stat span { font-size: 0.85rem; color: #444; }
+
+.group-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.group-grid div {
+  background: #fff;
+  border: 1.5px solid var(--red);
+  border-radius: 10px;
+  text-align: center;
+  padding: 10px 4px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+/* ---------- Forms ---------- */
+.box {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.box input[type="text"],
+.box input[type="number"],
+.box input[type="tel"],
+.box input[type="email"],
+.box input[type="password"],
+.box input[type="date"],
+.box select,
+.wide-input {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  background: #fff;
+}
+.box input:focus, .box select:focus, .wide-input:focus {
+  outline: 2px solid var(--red);
+  border-color: var(--red);
+}
+.small-label { font-size: 0.8rem; color: #444; margin-bottom: -6px; }
+.check { font-size: 0.9rem; display: flex; align-items: center; gap: 6px; }
+
+.red-btn {
+  background: var(--red);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.red-btn:hover { background: var(--red-dark); }
+.outline-btn {
+  background: #fff;
+  color: var(--red);
+  border: 1px solid var(--red);
+  border-radius: 8px;
+  padding: 8px 16px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.msg { font-size: 0.85rem; font-weight: bold; min-height: 1em; }
+.msg.error { color: var(--red); }
+.msg.success { color: var(--green); }
+
+/* ---------- Search results ---------- */
+.result-info { font-size: 0.85rem; margin: 10px 0 6px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  padding: 12px;
+}
+.card h3 { margin: 6px 0 2px; font-size: 1rem; }
+.card p { margin: 0 0 6px; font-size: 0.8rem; color: #444; }
+.badge-group {
+  display: inline-block;
+  background: var(--red);
+  color: #fff;
+  font-weight: bold;
+  border-radius: 6px;
+  padding: 3px 8px;
+}
+.tag {
+  display: inline-block;
+  font-size: 0.7rem;
+  border-radius: 10px;
+  padding: 2px 8px;
+  margin: 0 4px 8px 0;
+}
+.tag.ok { background: #e8f5e9; color: var(--green); }
+.tag.wait { background: #fff3e0; color: var(--orange); }
+.call-btn {
+  display: block;
+  background: var(--red);
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 0.9rem;
+}
+.note { font-size: 0.75rem; color: #666; margin-top: 12px; }
+
+/* ---------- Admin ---------- */
+.summary { font-size: 0.9rem; margin: 4px 0 8px; }
+.wide-input { margin-bottom: 8px; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; background: #fff; font-size: 0.8rem; }
+th { background: var(--red); color: #fff; text-align: left; padding: 8px; }
+td { padding: 9px 8px; border-bottom: 1px solid #eee; white-space: nowrap; }
+.tog, .del {
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 9px;
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+.tog { background: #444; }
+.del { background: var(--red); }
+
+/* ---------- Footer ---------- */
+.footer {
+  background: #333;
+  color: #fff;
+  text-align: center;
+  font-size: 0.75rem;
+  padding: 12px;
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 600px) {
+  .banner h1 { font-size: 1.3rem; }
+  .group-grid { grid-template-columns: repeat(2, 1fr); }
+  .cards { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+  <!-- ===== Top navigation bar ===== -->
+  <header class="topbar">
+    <div class="brand">&#10084; Blood Donor Finder</div>
+    <nav class="menu">
+      <button class="nav-btn active" data-page="home">Home</button>
+      <button class="nav-btn" data-page="register">Register</button>
+      <button class="nav-btn" data-page="find">Find Donor</button>
+      <button class="nav-btn" data-page="admin">Admin</button>
+    </nav>
+  </header>
+
+  <main class="container">
+
+    <!-- ===== HOME ===== -->
+    <section id="home" class="page active">
+      <div class="banner">
+        <h1>Donate Blood, Save Lives</h1>
+        <p>Register as a donor or find a donor of the required blood group in your city.</p>
+        <div class="banner-btns">
+          <button class="light-btn" data-goto="register">Become a Donor</button>
+          <button class="light-btn" data-goto="find">Find a Donor</button>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat"><b id="totalDonors">0</b><span>Total Donors</span></div>
+        <div class="stat"><b id="availableDonors">0</b><span>Available Donors</span></div>
+      </div>
+
+      <h3 class="center">Donors by Blood Group</h3>
+      <div id="groupStats" class="group-grid"></div>
+    </section>
+
+    <!-- ===== REGISTER ===== -->
+    <section id="register" class="page">
+      <h2>Donor Registration</h2>
+      <p class="hint">Donor must be 18-65 years old and weigh at least 45 kg.</p>
+      <form id="donorForm" class="box" novalidate>
+        <input type="text" id="name" placeholder="Full Name">
+        <input type="number" id="age" placeholder="Age">
+        <select id="gender">
+          <option value="">Select Gender</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+        </select>
+        <input type="number" id="weight" placeholder="Weight (kg)">
+        <select id="bloodGroup" class="bg-select"></select>
+        <input type="text" id="city" placeholder="City">
+        <input type="tel" id="mobile" placeholder="10-digit Mobile Number" maxlength="10">
+        <input type="email" id="email" placeholder="Email (optional)">
+        <label for="lastDonation" class="small-label">Last Donation Date (optional)</label>
+        <input type="date" id="lastDonation">
+        <label class="check"><input type="checkbox" id="available" checked> I am available to donate</label>
+        <button type="submit" class="red-btn">Register</button>
+        <div id="formMsg" class="msg"></div>
+      </form>
+    </section>
+
+    <!-- ===== FIND DONOR ===== -->
+    <section id="find" class="page">
+      <h2>Find a Blood Donor</h2>
+      <div class="box">
+        <select id="searchGroup" class="bg-select"></select>
+        <input type="text" id="searchCity" placeholder="City (leave blank for all)">
+        <label class="check"><input type="checkbox" id="compatible"> Show compatible donors</label>
+        <label class="check"><input type="checkbox" id="eligibleOnly"> Only eligible and available</label>
+        <button id="searchBtn" class="red-btn" type="button">Search</button>
+      </div>
+      <p id="resultInfo" class="result-info"></p>
+      <div id="results" class="cards"></div>
+      <p class="note">Final medical screening is always done by the blood bank or hospital.</p>
+    </section>
+
+    <!-- ===== ADMIN ===== -->
+    <section id="admin" class="page">
+      <h2>Admin Panel</h2>
+
+      <div id="adminLogin" class="box">
+        <input type="password" id="adminPass" placeholder="Enter admin password">
+        <button id="loginBtn" class="red-btn" type="button">Login</button>
+        <div id="loginMsg" class="msg"></div>
+      </div>
+
+      <div id="adminPanel" class="hidden">
+        <p id="adminSummary" class="summary"></p>
+        <input type="text" id="adminFilter" class="wide-input" placeholder="Search by name, city or blood group">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th><th>Group</th><th>City</th><th>Mobile</th>
+                <th>Last Donation</th><th>Status</th><th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="donorTable"></tbody>
+          </table>
+        </div>
+        <button id="logoutBtn" class="outline-btn" type="button">Logout</button>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">&copy; 2026 Blood Donor Finder | B.Sc. Computer Science Project</footer>
+
+  <script>
+const STORAGE_KEY = "bdf_donors";
+const ADMIN_PASSWORD = "Admin@123";
+const GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+
+// Patient group -> donor groups that can give blood
+const compatibility = {
+  "O-": ["O-"],
+  "O+": ["O+", "O-"],
+  "A-": ["A-", "O-"],
+  "A+": ["A+", "A-", "O+", "O-"],
+  "B-": ["B-", "O-"],
+  "B+": ["B+", "B-", "O+", "O-"],
+  "AB-": ["AB-", "A-", "B-", "O-"],
+  "AB+": ["AB+", "AB-", "A+", "A-", "B+", "B-", "O+", "O-"]
+};
+
+// ---------- Storage ----------
+function getDonors() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveDonors(list) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+}
+
+// ---------- Sample data (imaginary donors) ----------
+// Loaded only the first time the website is opened in a browser,
+// so that the Home, Find Donor and Admin screens are not empty.
+function loadSampleData() {
+  if (localStorage.getItem(STORAGE_KEY) !== null) return;
+  const s = (id, name, age, gender, weight, bloodGroup, city, mobile, lastDonation, available) => ({
+    id, name, age, gender, weight, bloodGroup, city, mobile,
+    email: "", lastDonation, available, registeredOn: "2026-09-02"
+  });
+  saveDonors([
+    s(1001, "Amit Kulkarni", 24, "Male",   68, "B+",  "Pune",   "9876543210", "2026-05-10", true),
+    s(1002, "Neha Joshi",    21, "Female", 52, "O-",  "Mumbai", "8765432109", "",           true),
+    s(1003, "Rahul Patil",   29, "Male",   72, "A+",  "Pune",   "9823456710", "2026-10-01", true),
+    s(1004, "Priya Deshmukh",26, "Female", 55, "A-",  "Kalyan", "9922334455", "",           true),
+    s(1005, "Sagar Pawar",   33, "Male",   75, "O+",  "Pune",   "9765432180", "2026-04-18", true),
+    s(1006, "Kavya Iyer",    28, "Female", 58, "B+",  "Thane",  "9870011223", "",           true),
+    s(1007, "Rohan Shinde",  27, "Male",   70, "B+",  "Pune",   "9011223344", "2026-09-20", true),
+    s(1008, "Sneha More",    30, "Female", 60, "AB+", "Mumbai", "9898989898", "",           true),
+    s(1009, "Vikas Yadav",   35, "Male",   80, "O-",  "Pune",   "9123456780", "2026-03-02", true),
+    s(1010, "Pooja Gupta",   25, "Female", 54, "A+",  "Kalyan", "9988776655", "",           false),
+    s(1011, "Arjun Nair",    31, "Male",   77, "AB-", "Thane",  "9090909090", "2026-06-30", true),
+    s(1012, "Meera Sawant",  23, "Female", 50, "B-",  "Pune",   "9345678901", "",           true)
+  ]);
+}
+
+// ---------- Helpers ----------
+function escapeHTML(text) {
+  const div = document.createElement("div");
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function daysSince(dateStr) {
+  if (!dateStr) return Infinity;
+  const diff = Date.now() - new Date(dateStr).getTime();
+  return Math.floor(diff / (1000 * 60 * 60 * 24));
+}
+
+function isEligible(donor) {
+  return daysSince(donor.lastDonation) >= 90;
+}
+
+function showMsg(el, text, type) {
+  el.textContent = text;
+  el.className = "msg " + type;
+}
+
+// Fill both blood group drop-downs
+document.querySelectorAll(".bg-select").forEach(sel => {
+  sel.innerHTML = '<option value="">Select Blood Group</option>' +
+    GROUPS.map(g => `<option value="${g}">${g}</option>`).join("");
+});
+
+// ---------- Navigation ----------
+function showPage(id) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  document.querySelectorAll(".nav-btn").forEach(b =>
+    b.classList.toggle("active", b.dataset.page === id));
+  if (id === "home") updateStats();
+  if (id === "admin" && sessionStorage.getItem("bdf_admin") === "yes") showAdminPanel();
+}
+
+document.querySelectorAll("[data-page]").forEach(b =>
+  b.addEventListener("click", () => showPage(b.dataset.page)));
+document.querySelectorAll("[data-goto]").forEach(b =>
+  b.addEventListener("click", () => showPage(b.dataset.goto)));
+
+// ---------- Home statistics ----------
+function updateStats() {
+  const donors = getDonors();
+  document.getElementById("totalDonors").textContent = donors.length;
+  document.getElementById("availableDonors").textContent =
+    donors.filter(d => d.available).length;
+  document.getElementById("groupStats").innerHTML = GROUPS.map(g =>
+    `<div>${g}<br>${donors.filter(d => d.bloodGroup === g).length}</div>`).join("");
+}
+
+// ---------- Registration ----------
+function validate(d) {
+  if (!/^[A-Za-z ]{3,}$/.test(d.name)) return "Please enter a valid full name.";
+  if (isNaN(d.age) || d.age < 18 || d.age > 65) return "Donor age must be between 18 and 65 years.";
+  if (!d.gender) return "Please select your gender.";
+  if (isNaN(d.weight) || d.weight < 45) return "Donor weight must be at least 45 kg.";
+  if (!GROUPS.includes(d.bloodGroup)) return "Please select your blood group.";
+  if (d.city.length < 2) return "Please enter your city.";
+  if (!/^[6-9]\d{9}$/.test(d.mobile)) return "Please enter a valid 10-digit mobile number.";
+  if (d.email && !/^\S+@\S+\.\S+$/.test(d.email)) return "Please enter a valid email address.";
+  if (d.lastDonation && new Date(d.lastDonation) > new Date())
+    return "Last donation date cannot be in the future.";
+  return "";
+}
+
+document.getElementById("donorForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const val = id => document.getElementById(id).value.trim();
+  const donor = {
+    id: Date.now(),
+    name: val("name"),
+    age: parseInt(val("age")),
+    gender: val("gender"),
+    weight: parseFloat(val("weight")),
+    bloodGroup: val("bloodGroup"),
+    city: val("city"),
+    mobile: val("mobile"),
+    email: val("email"),
+    lastDonation: val("lastDonation"),
+    available: document.getElementById("available").checked,
+    registeredOn: new Date().toISOString().slice(0, 10)
+  };
+  const msg = document.getElementById("formMsg");
+  const error = validate(donor);
+  if (error) return showMsg(msg, error, "error");
+  const donors = getDonors();
+  if (donors.some(d => d.mobile === donor.mobile))
+    return showMsg(msg, "This mobile number is already registered.", "error");
+  donors.push(donor);
+  saveDonors(donors);
+  e.target.reset();
+  document.getElementById("available").checked = true;
+  showMsg(msg, "Donor registered successfully. Thank you for joining!", "success");
+  updateStats();
+});
+
+// ---------- Search ----------
+document.getElementById("searchBtn").addEventListener("click", () => {
+  const group = document.getElementById("searchGroup").value;
+  const city = document.getElementById("searchCity").value.trim().toLowerCase();
+  const info = document.getElementById("resultInfo");
+  const box = document.getElementById("results");
+  box.innerHTML = "";
+  if (!group) {
+    info.textContent = "Please select the required blood group.";
+    return;
+  }
+  const allowed = document.getElementById("compatible").checked ? compatibility[group] : [group];
+  const eligibleOnly = document.getElementById("eligibleOnly").checked;
+  const list = getDonors()
+    .filter(d => allowed.includes(d.bloodGroup))
+    .filter(d => d.city.toLowerCase().includes(city))
+    .filter(d => !eligibleOnly || (d.available && isEligible(d)))
+    .sort((a, b) => (b.bloodGroup === group) - (a.bloodGroup === group));
+  if (list.length === 0) {
+    info.textContent = "No donor found. Try another city or tick Show compatible donors.";
+    return;
+  }
+  info.textContent = list.length + " donor(s) found.";
+  box.innerHTML = list.map(d => {
+    const wait = 90 - daysSince(d.lastDonation);
+    const status = !d.available ? '<span class="tag wait">Not available</span>'
+      : wait > 0 ? `<span class="tag wait">Eligible after ${wait} days</span>`
+      : '<span class="tag ok">Eligible</span>';
+    const match = d.bloodGroup === group ? "" : '<span class="tag ok">Compatible</span>';
+    return `<div class="card">
+      <span class="badge-group">${d.bloodGroup}</span>
+      <h3>${escapeHTML(d.name)}</h3>
+      <p>${d.age} yrs, ${escapeHTML(d.gender)} | ${escapeHTML(d.city)}</p>
+      ${status}${match}
+      <a class="call-btn" href="tel:${d.mobile}">Call ${d.mobile}</a>
+    </div>`;
+  }).join("");
+});
+
+// ---------- Admin ----------
+document.getElementById("loginBtn").addEventListener("click", () => {
+  const pass = document.getElementById("adminPass");
+  if (pass.value === ADMIN_PASSWORD) {
+    sessionStorage.setItem("bdf_admin", "yes");
+    pass.value = "";
+    showAdminPanel();
+  } else {
+    showMsg(document.getElementById("loginMsg"), "Incorrect password.", "error");
+  }
+});
+
+function showAdminPanel() {
+  document.getElementById("adminLogin").classList.add("hidden");
+  document.getElementById("adminPanel").classList.remove("hidden");
+  renderTable();
+}
+
+function renderTable() {
+  const donors = getDonors();
+  const q = document.getElementById("adminFilter").value.trim().toLowerCase();
+  const available = donors.filter(d => d.available).length;
+  const eligible = donors.filter(d => d.available && isEligible(d)).length;
+  document.getElementById("adminSummary").textContent =
+    `Total donors: ${donors.length} | Available: ${available} | Eligible now: ${eligible}`;
+  document.getElementById("donorTable").innerHTML = donors
+    .filter(d => (d.name + " " + d.city + " " + d.bloodGroup).toLowerCase().includes(q))
+    .map(d => `<tr>
+      <td>${escapeHTML(d.name)}</td>
+      <td>${d.bloodGroup}</td>
+      <td>${escapeHTML(d.city)}</td>
+      <td>${d.mobile}</td>
+      <td>${escapeHTML(d.lastDonation || "-")}</td>
+      <td>${d.available ? "Available" : "Not available"}</td>
+      <td>
+        <button class="tog" onclick="toggleDonor(${d.id})">Toggle</button>
+        <button class="del" onclick="deleteDonor(${d.id})">Delete</button>
+      </td>
+    </tr>`).join("");
+}
+
+document.getElementById("adminFilter").addEventListener("input", renderTable);
+
+function toggleDonor(id) {
+  const donors = getDonors();
+  const donor = donors.find(d => d.id === id);
+  if (donor) {
+    donor.available = !donor.available;
+    saveDonors(donors);
+    renderTable();
+  }
+}
+
+function deleteDonor(id) {
+  if (!confirm("Delete this donor?")) return;
+  saveDonors(getDonors().filter(d => d.id !== id));
+  renderTable();
+}
+
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  sessionStorage.removeItem("bdf_admin");
+  document.getElementById("adminPanel").classList.add("hidden");
+  document.getElementById("adminLogin").classList.remove("hidden");
+});
+
+loadSampleData();
+updateStats();
+</script>
+</body>
+</html>
